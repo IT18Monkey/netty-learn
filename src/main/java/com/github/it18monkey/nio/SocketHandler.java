@@ -15,32 +15,23 @@ public class SocketHandler implements Runnable {
         this.socketChannel = socketChannel;
     }
 
-    @Override
     public void run() {
-
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        ByteBuffer readBuffer = ByteBuffer.allocate(8);
         try {
-            // 将请求数据读入 Buffer 中
-            int num;
-            while ((num = socketChannel.read(buffer)) > 0) {
-                // 读取 Buffer 内容之前先 flip 一下
-                buffer.flip();
-
-                // 提取 Buffer 中的数据
+            int num ;
+            while ((num=socketChannel.read(readBuffer))>0){
+                readBuffer.flip();
                 byte[] bytes = new byte[num];
-                buffer.get(bytes);
+                readBuffer.get(bytes);
 
-                String re = new String(bytes, "UTF-8");
-                System.out.println("收到请求：" + re);
-
-                // 回应客户端
-                ByteBuffer writeBuffer = ByteBuffer.wrap(("我已经收到你的请求，你的请求内容是：" + re).getBytes());
+                System.out.println(Thread.currentThread().getName()+" 收到数据：" + new String(bytes, "UTF-8"));
+                ByteBuffer writeBuffer = ByteBuffer.wrap("服务端返回的数据...".getBytes());
                 socketChannel.write(writeBuffer);
-
-                buffer.clear();
+                readBuffer.clear();
             }
-        } catch (IOException e) {
-//            IOUtils.closeQuietly(socketChannel);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 }
