@@ -14,7 +14,8 @@ public class FileChannelTest {
     public static void main(String[] args) throws Exception {
         FileChannelTest test = new FileChannelTest();
 //        test.readFile();
-        test.writeFile();
+//        test.writeFile();
+        test.copyFile();
     }
 
     public void readFile() throws Exception {
@@ -38,5 +39,22 @@ public class FileChannelTest {
             fileChannel.write(buffer);
         }
         outputStream.close();
+    }
+
+    public void copyFile() throws Exception {
+        FileInputStream inputStream = new FileInputStream(getClass().getClassLoader().getResource("in.txt").getFile());
+        FileChannel inputStreamChannel = inputStream.getChannel();
+        FileOutputStream outputStream = new FileOutputStream((getClass().getClassLoader().getResource("out.txt").getFile()));
+        FileChannel outputStreamChannel = outputStream.getChannel();
+        ByteBuffer byteBuffer = ByteBuffer.allocate(8);
+        while (true) {
+            int r = inputStreamChannel.read(byteBuffer);
+            if (r == -1) {
+                break;
+            }
+            byteBuffer.flip();
+            outputStreamChannel.write(byteBuffer);
+            byteBuffer.clear();
+        }
     }
 }
