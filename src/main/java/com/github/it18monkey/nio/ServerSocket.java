@@ -41,20 +41,21 @@ public class ServerSocket {
                     socketChannel.register(selector, SelectionKey.OP_READ);
                 } else if (selectionKey.isReadable()) {
                     SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
-//                    new Thread(new SocketHandler(socketChannel)).start();
                     ByteBuffer readBuffer = ByteBuffer.allocate(8);
                     try {
-                        int num ;
-                        while ((num=socketChannel.read(readBuffer))>0){
+                        int num;
+                        String request = "";
+                        while ((num = socketChannel.read(readBuffer)) > 0) {
                             readBuffer.flip();
                             byte[] bytes = new byte[num];
                             readBuffer.get(bytes);
-
-                            System.out.println(Thread.currentThread().getName()+" 收到数据：" + new String(bytes, "UTF-8"));
-                            ByteBuffer writeBuffer = ByteBuffer.wrap("服务端返回的数据...".getBytes());
-                            socketChannel.write(writeBuffer);
+                            request += new String(bytes, "UTF-8");
                             readBuffer.clear();
                         }
+                        System.out.println(Thread.currentThread().getName() + " 收到数据：" + request);
+                        ByteBuffer writeBuffer = ByteBuffer.wrap("服务端返回的数据...".getBytes("UTF-8"));
+                        socketChannel.write(writeBuffer);
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
